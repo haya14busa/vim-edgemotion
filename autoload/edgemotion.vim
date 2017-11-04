@@ -13,11 +13,11 @@ function! edgemotion#move(dir) abort
   endif
   let next_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gj' : 'gk'
   let prev_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gk' : 'gj'
-  let orig_col = col('.')
+  let orig_col = virtcol('.')
   let last_line = line('.')
   while 1
     execute 'normal!' next_cmd
-    if (col('.') < orig_col) || (orig_col is# 1 && getline('.') ==# '')
+    if (virtcol('.') < orig_col) || (orig_col is# 1 && getline('.') ==# '')
       execute 'normal!' prev_cmd
       break
     elseif line('.') is# last_line
