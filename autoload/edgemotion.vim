@@ -11,34 +11,53 @@ function! edgemotion#move(dir) abort
   if mode(1) is# 'no'
     normal! V
   endif
+  let next_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gj' : 'gk'
+  let prev_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gk' : 'gj'
+  let orig_vcol = virtcol('.')
+  let orig_col = col('.')
+
+  let curswant = getcurpos()[4]
+  if curswant > 100000
+    call winrestview({'curswant': len(getline('.'))})
+  endif
+
+  let saveview = winsaveview()
+  execute 'normal!' next_cmd
   let virtualedit_save = &virtualedit
   let &virtualedit = ''
   try
-    call s:edgemotion_internal(a:dir)
+    let next_vcol = virtcol('.')
+    call winrestview(saveview)
+    if orig_vcol is# next_vcol
+      call s:move_to_edge(next_cmd, prev_cmd, orig_vcol)
+    else
+      call s:move_to_next_edge(next_cmd, prev_cmd, orig_vcol)
+    endif
   finally
     let &virtualedit = virtualedit_save
   endtry
 endfunction
 
-function! s:edgemotion_internal(dir) abort
-  let next_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gj' : 'gk'
-  let prev_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gk' : 'gj'
-  let orig_col = virtcol('.')
-  call winrestview({'curswant': col('.') - 1})
-  call s:move_to_edge(next_cmd, prev_cmd, orig_col)
-endfunction
-
-function! s:move_to_edge(next_cmd, prev_cmd, orig_col) abort
-  let last_line = line('.')
+function! s:move_to_edge(next_cmd, prev_cmd, orig_vcol) abort
   while 1
     execute 'normal!' a:next_cmd
-    if (virtcol('.') < a:orig_col) || (a:orig_col is# 1 && getline('.') ==# '')
+    if (virtcol('.') < a:orig_vcol) || (a:orig_vcol is# 1 && getline('.') ==# '')
       execute 'normal!' a:prev_cmd
       break
-    elseif line('.') is# last_line
+    elseif line('.') is# 1 || line('.') is# line('$')
       break
     endif
-    let last_line = line('.')
+  endwhile
+endfunction
+
+function! s:move_to_next_edge(next_cmd, prev_cmd, orig_vcol) abort
+  while 1
+    execute 'normal!' a:next_cmd
+    if (virtcol('.') >= a:orig_vcol) ||
+    \  (a:orig_vcol is# 1 && getline('.') !=# '') ||
+    \  (line('.') is# 1 || line('.') is# line('$'))
+      break
+    endif
   endwhile
 endfunction
 
