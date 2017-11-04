@@ -9,30 +9,42 @@ let s:DIRECTION = { 'FORWARD': 1, 'BACKWARD': 0 }
 
 function! edgemotion#move(dir) abort
   if mode(1) is# 'v' || mode(1) is# 'V' || mode(1) is# 'CTRL_V'
-    let visual_mode = 1
+    let is_visual = 1
   elseif mode(1) is# 'no'
-    let visual_mode = 0
-  else
-    let visual_mode = 0
+    let is_visual = 0
     normal! V
   endif
 
+  let virtualedit_save = &virtualedit
+  let &virtualedit = ''
+  try
+    call s:edgemotion_internal(a:dir, is_visual)
+  finally
+    let &virtualedit = virtualedit_save
+  endtry
+endfunction
+
+function! s:edgemotion_internal(dir, is_visual) abort
   let next_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gj' : 'gk'
   let prev_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gk' : 'gj'
   let orig_col = virtcol('.')
+  call winrestview({'curswant': col('.') - 1})
+  call s:move_to_edge(next_cmd, prev_cmd, orig_col, a:is_visual)
+endfunction
+
+function! s:move_to_edge(next_cmd, prev_cmd, orig_col, is_visual) abort
   let last_line = line('.')
-  call winrestview({'curswant': col('.')})
   while 1
-    if visual_mode == 1
-      execute next_cmd
+    if a:is_visual == 1
+      execute a:next_cmd
     else
-      execute 'normal!' next_cmd
+      execute 'normal!' a:next_cmd
     endif
-    if (virtcol('.') < orig_col) || (orig_col is# 1 && getline('.') ==# '')
-      if visual_mode == 1
-        execute prev_cmd
+    if (virtcol('.') < a:orig_col) || (a:orig_col is# 1 && getline('.') ==# '')
+      if a:is_visual == 1
+        execute a:prev_cmd
       else
-        execute 'normal!' prev_cmd
+        execute 'normal!' a:prev_cmd
       endif
       break
     elseif line('.') is# last_line
