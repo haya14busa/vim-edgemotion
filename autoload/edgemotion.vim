@@ -15,6 +15,7 @@ function! edgemotion#move(dir) abort
   let prev_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gk' : 'gj'
   let orig_col = virtcol('.')
   let last_line = line('.')
+  call winrestview({'curswant': col('.')})
   while 1
     execute 'normal!' next_cmd
     if (virtcol('.') < orig_col) || (orig_col is# 1 && getline('.') ==# '')
