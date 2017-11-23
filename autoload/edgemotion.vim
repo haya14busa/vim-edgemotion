@@ -8,57 +8,63 @@ scriptencoding utf-8
 let s:DIRECTION = { 'FORWARD': 1, 'BACKWARD': 0 }
 
 function! edgemotion#move(dir) abort
-  if mode(1) is# 'no'
-    normal! V
-  endif
-  let next_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gj' : 'gk'
-  let prev_cmd = a:dir is# s:DIRECTION.FORWARD ? 'gk' : 'gj'
-  let orig_vcol = virtcol('.')
-  let orig_col = col('.')
-
+  let delta = a:dir is# s:DIRECTION.FORWARD ? 1 : -1
   let curswant = getcurpos()[4]
   if curswant > 100000
-    call winrestview({'curswant': len(getline('.'))})
+    call winrestview({'curswant': len(getline('.'))-1})
+  endif
+  let vcol = virtcol('.')
+  let orig_lnum = line('.')
+
+  let island_start = s:island(orig_lnum, vcol)
+  let island_next = s:island(orig_lnum + delta, vcol)
+
+  let should_move_to_land = !(island_start && island_next)
+  let lnum = orig_lnum
+  let last_lnum = line('w$')
+
+  if should_move_to_land
+    if (island_start && !island_next)
+      let lnum += delta
+    endif
+    while lnum != 0 && lnum < last_lnum && !s:island(lnum, vcol)
+      let lnum += delta
+    endwhile
+  else
+    while lnum != 0 && lnum < last_lnum && s:island(lnum, vcol)
+      let lnum += delta
+    endwhile
+    let lnum -= delta
   endif
 
-  let saveview = winsaveview()
-  execute 'normal!' next_cmd
-  let virtualedit_save = &virtualedit
-  let &virtualedit = ''
-  try
-    let next_vcol = virtcol('.')
-    call winrestview(saveview)
-    if orig_vcol is# next_vcol
-      call s:move_to_edge(next_cmd, prev_cmd, orig_vcol)
-    else
-      call s:move_to_next_edge(next_cmd, prev_cmd, orig_vcol)
-    endif
-  finally
-    let &virtualedit = virtualedit_save
-  endtry
+  let move_cmd = a:dir is# s:DIRECTION.FORWARD ? 'j' : 'k'
+  return abs(lnum-orig_lnum) . move_cmd
 endfunction
 
-function! s:move_to_edge(next_cmd, prev_cmd, orig_vcol) abort
-  while 1
-    execute 'normal!' a:next_cmd
-    if (virtcol('.') < a:orig_vcol) || (a:orig_vcol is# 1 && getline('.') ==# '')
-      execute 'normal!' a:prev_cmd
-      break
-    elseif line('.') is# 1 || line('.') is# line('$')
-      break
-    endif
-  endwhile
+function! s:island(lnum, vcol) abort
+  let c = s:get_virtcol_char(a:lnum, a:vcol)
+  if c ==# ''
+    return 0
+  endif
+  if !s:iswhite(c)
+    return 1
+  endif
+  let pattern = printf('^.\{-}\zs.\%%<%dv.\%%>%dv.', a:vcol+1, a:vcol)
+  let m = matchstr(getline(a:lnum), pattern)
+  let chars = split(m, '\zs')
+  if len(chars) !=# 3
+    return 0
+  endif
+  return !s:iswhite(chars[0]) && !s:iswhite(chars[2])
 endfunction
 
-function! s:move_to_next_edge(next_cmd, prev_cmd, orig_vcol) abort
-  while 1
-    execute 'normal!' a:next_cmd
-    if (virtcol('.') >= a:orig_vcol) ||
-    \  (a:orig_vcol is# 1 && getline('.') !=# '') ||
-    \  (line('.') is# 1 || line('.') is# line('$'))
-      break
-    endif
-  endwhile
+function! s:iswhite(str) abort
+  return a:str =~# '^[ \t]$'
+endfunction
+
+function! s:get_virtcol_char(lnum, vcol) abort
+  let pattern = printf('^.\{-}\zs\%%<%dv.\%%>%dv', a:vcol+1, a:vcol)
+  return matchstr(getline(a:lnum), pattern)
 endfunction
 
 " __END__

@@ -12,8 +12,8 @@ if exists('g:loaded_edgemotion')
 endif
 let g:loaded_edgemotion = 1
 
-noremap <silent> <Plug>(edgemotion-j) :<C-u>call edgemotion#move(1)<CR>
-noremap <silent> <Plug>(edgemotion-k) :<C-u>call edgemotion#move(0)<CR>
+noremap <silent><expr> <Plug>(edgemotion-j) edgemotion#move(1)
+noremap <silent><expr> <Plug>(edgemotion-k) edgemotion#move(0)
 
 " __END__
 " vim: expandtab softtabstop=2 shiftwidth=2 foldmethod=marker
