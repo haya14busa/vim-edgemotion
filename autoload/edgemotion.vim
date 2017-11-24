@@ -27,11 +27,11 @@ function! edgemotion#move(dir) abort
     if (island_start && !island_next)
       let lnum += delta
     endif
-    while lnum != 0 && lnum < last_lnum && !s:island(lnum, vcol)
+    while lnum != 0 && lnum <= last_lnum && !s:island(lnum, vcol)
       let lnum += delta
     endwhile
   else
-    while lnum != 0 && lnum < last_lnum && s:island(lnum, vcol)
+    while lnum != 0 && lnum <= last_lnum && s:island(lnum, vcol)
       let lnum += delta
     endwhile
     let lnum -= delta
