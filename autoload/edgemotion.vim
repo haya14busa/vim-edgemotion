@@ -26,7 +26,7 @@ function! edgemotion#move(dir) abort
 
   let should_move_to_land = !(island_start && island_next)
   let lnum = orig_lnum
-  let last_lnum = line('w$')
+  let last_lnum = line('$')
 
   if should_move_to_land
     if (island_start && !island_next)
