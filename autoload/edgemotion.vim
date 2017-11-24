@@ -2,6 +2,11 @@
 " FILE: autoload/edgemotion.vim
 " AUTHOR: haya14busa
 " License: MIT license
+"
+" TERMINOLOGY:
+" - land: non-white code block.
+" - shore: edge of land.
+" - sea: white space.
 "=============================================================================
 scriptencoding utf-8
 
