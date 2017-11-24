@@ -6,7 +6,11 @@ git:
 matrix:
   include:
     - env: VIM_VERSION=v8.0.0000
-    - env: VIM_VERSION=master
+    - env:
+      - VIM_VERSION=master
+      - THEMIS_PROFILE=vim-profile.txt
+
+cache: pip
 
 addons:
   apt:
@@ -16,6 +20,8 @@ addons:
 install:
   - bash scripts/install-vim.sh
   - export PATH=$HOME/vim/bin:$PATH
+    # Install https://github.com/Vimjas/covimerage
+  - pip install covimerage --user
 
 before_script:
   - git clone --depth 1 --branch v1.5.3 --single-branch https://github.com/thinca/vim-themis /tmp/vim-themis
@@ -26,3 +32,8 @@ script:
   - vim --cmd version --cmd quit
   - vim --cmd "try | helptags doc/ | catch | cquit | endtry" --cmd quit
   - /tmp/vim-themis/bin/themis --reporter dot
+
+after_success:
+  - covimerage write_coverage $THEMIS_PROFILE
+  - coverage xml
+  - bash <(curl -s https://codecov.io/bash)
