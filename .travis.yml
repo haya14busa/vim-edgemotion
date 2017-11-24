@@ -5,7 +5,6 @@ git:
 
 matrix:
   include:
-    - env: VIM_VERSION=v7.4
     - env: VIM_VERSION=v8.0.0000
     - env: VIM_VERSION=master
 
