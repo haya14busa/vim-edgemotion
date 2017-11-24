@@ -42,6 +42,11 @@ function! edgemotion#move(dir) abort
     let lnum -= delta
   endif
 
+  " Edge not found.
+  if lnum == 0 || lnum == last_lnum + 1
+    return ''
+  endif
+
   let move_cmd = a:dir is# s:DIRECTION.FORWARD ? 'j' : 'k'
   return abs(lnum-orig_lnum) . move_cmd
 endfunction
