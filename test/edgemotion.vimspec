@@ -1,0 +1,106 @@
+Describe edgemotion
+
+  function! CursorChar() abort
+    let vcol = virtcol('.')
+    let pattern = printf('^.\{-}\zs\%%<%dv.\%%>%dv', vcol+1, vcol)
+    return matchstr(getline('.'), pattern)
+  endfunction
+
+  Describe edgemotion#move()
+    Before all
+      let s:DIRECTION = { 'FORWARD': 1, 'BACKWARD': 0 }
+      let lines = [
+      \   '" Line 1',
+      \   '',
+      \   'function! s:f() abort',
+      \   '  if 1',
+      \   '    " if 1',
+      \   '    " b',
+      \   '  elseif 2',
+      \   '    " elseif 2',
+      \   '  endif',
+      \   'endfunction',
+      \   '',
+      \   '',
+      \   '" END',
+      \ ]
+      for line in lines
+        put=line
+      endfor
+      1 delete _
+      Assert Equals(getline('.'), lines[0])
+      Assert Equals(getline('$'), lines[-1])
+    End
+
+    Before each
+      1
+    End
+
+    It moves cursor by indent based edge
+      " function to endfunction
+      call cursor(3, 1)
+      Assert Equals(getline('.'), 'function! s:f() abort')
+      Assert Equals(CursorChar(), 'f')
+      let move_cmds = edgemotion#move(s:DIRECTION.FORWARD)
+      Assert Equals(move_cmds, '7j')
+      execute 'normal!' move_cmds
+      Assert Equals(getline('.'), 'endfunction')
+      Assert Equals(CursorChar(), 'e')
+
+      " endfunction to function
+      let move_cmds = edgemotion#move(s:DIRECTION.BACKWARD)
+      Assert Equals(move_cmds, '7k')
+      execute 'normal!' move_cmds
+      Assert Equals(getline('.'), 'function! s:f() abort')
+      Assert Equals(CursorChar(), 'f')
+      " if to eliseif to else
+      call cursor(4, 3)
+      Assert Equals(getline('.'), '  if 1')
+      Assert Equals(CursorChar(), 'i')
+      execute 'normal!' edgemotion#move(s:DIRECTION.FORWARD)
+      Assert Equals(getline('.'), '  elseif 2')
+      Assert Equals(CursorChar(), 'e')
+      execute 'normal!' edgemotion#move(s:DIRECTION.FORWARD)
+      Assert Equals(getline('.'), '  endif')
+      Assert Equals(CursorChar(), 'e')
+      " else to elseif to if
+      execute 'normal!' edgemotion#move(s:DIRECTION.BACKWARD)
+      Assert Equals(getline('.'), '  elseif 2')
+      Assert Equals(CursorChar(), 'e')
+      execute 'normal!' edgemotion#move(s:DIRECTION.BACKWARD)
+      Assert Equals(getline('.'), '  if 1')
+      Assert Equals(CursorChar(), 'i')
+    End
+
+    It consider space between non-space character as land
+      call cursor(3, 5)
+      Assert Equals(CursorChar(), 't')
+      Assert Equals(getline('.'), 'function! s:f() abort')
+      execute 'normal!' edgemotion#move(s:DIRECTION.FORWARD)
+      Assert Equals(CursorChar(), 'u')
+      Assert Equals(getline('.'), 'endfunction')
+      execute 'normal!' edgemotion#move(s:DIRECTION.BACKWARD)
+      Assert Equals(CursorChar(), 't')
+      Assert Equals(getline('.'), 'function! s:f() abort')
+    End
+
+    It land-to-land through sea
+      call cursor(3, 11)
+      Assert Equals(getline('.'), 'function! s:f() abort')
+      Assert Equals(CursorChar(), 's')
+      execute 'normal!' edgemotion#move(s:DIRECTION.FORWARD)
+      Assert Equals(getline('.'), '    " elseif 2')
+      Assert Equals(CursorChar(), 'i')
+      execute 'normal!' edgemotion#move(s:DIRECTION.FORWARD)
+      Assert Equals(getline('.'), 'endfunction')
+      Assert Equals(CursorChar(), 'n')
+      execute 'normal!' edgemotion#move(s:DIRECTION.BACKWARD)
+      Assert Equals(getline('.'), '    " elseif 2')
+      Assert Equals(CursorChar(), 'i')
+      execute 'normal!' edgemotion#move(s:DIRECTION.BACKWARD)
+      Assert Equals(getline('.'), 'function! s:f() abort')
+      Assert Equals(CursorChar(), 's')
+    End
+
+  End
+End
