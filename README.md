@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/haya14busa/vim-edgemotion.svg?branch=master)](https://travis-ci.org/haya14busa/vim-edgemotion)
 [![](http://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![](http://img.shields.io/badge/doc-%3Ah%20edgemotion.txt-red.svg)](doc/edgemotionw.txt)
+[![](http://img.shields.io/badge/doc-%3Ah%20edgemotion.txt-red.svg)](doc/edgemotion.txt)
 
 `<Plug>(edgemotion-j)` and `<Plug>(edgemotion-k)` motion is like `j`, `k`, but stops at edge only.
 
