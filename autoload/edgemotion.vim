@@ -7,6 +7,10 @@
 " - land: non-white code block.
 " - shore: edge of land.
 " - sea: white space.
+"
+" Visualization of code block:
+" Code block regex: [^[:space:]][[:space:]]\ze[^[:space:]]\|[^[:space:]]
+" :let @/ = '[^[:space:]][[:space:]]\ze[^[:space:]]\|[^[:space:]]' | set hls
 "=============================================================================
 scriptencoding utf-8
 
