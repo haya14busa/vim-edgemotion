@@ -16,7 +16,12 @@ scriptencoding utf-8
 
 let s:DIRECTION = { 'FORWARD': 1, 'BACKWARD': 0 }
 
-function! edgemotion#move(dir) abort
+function! edgemotion#move(op, dir) abort
+  let cnt = v:prevcount " get count of the previous command.
+  if cnt == 0
+    let cnt += 1
+  endif
+
   let delta = a:dir is# s:DIRECTION.FORWARD ? 1 : -1
   let curswant = getcurpos()[4]
   if curswant > 100000
@@ -25,34 +30,50 @@ function! edgemotion#move(dir) abort
   let vcol = virtcol('.')
   let orig_lnum = line('.')
 
-  let island_start = s:island(orig_lnum, vcol)
-  let island_next = s:island(orig_lnum + delta, vcol)
-
-  let should_move_to_land = !(island_start && island_next)
   let lnum = orig_lnum
   let last_lnum = line('$')
 
-  if should_move_to_land
-    if (island_start && !island_next)
-      let lnum += delta
+  let c = 1
+  while c <= cnt
+
+    let island_start = s:island(lnum, vcol)
+    let island_next = s:island(lnum + delta, vcol)
+
+    let should_move_to_land = !(island_start && island_next)
+
+    if should_move_to_land
+      if (island_start && !island_next)
+        let lnum += delta
+      endif
+      while lnum != 0 && lnum <= last_lnum && !s:island(lnum, vcol)
+        let lnum += delta
+      endwhile
+    else
+      while lnum != 0 && lnum <= last_lnum && s:island(lnum, vcol)
+        let lnum += delta
+      endwhile
+      let lnum -= delta
     endif
-    while lnum != 0 && lnum <= last_lnum && !s:island(lnum, vcol)
-      let lnum += delta
-    endwhile
-  else
-    while lnum != 0 && lnum <= last_lnum && s:island(lnum, vcol)
-      let lnum += delta
-    endwhile
-    let lnum -= delta
-  endif
+
+    let c += 1
+  endwhile
 
   " Edge not found.
   if lnum == 0 || lnum == last_lnum + 1
-    return ''
+    return
   endif
 
   let move_cmd = a:dir is# s:DIRECTION.FORWARD ? 'j' : 'k'
-  return abs(lnum-orig_lnum) . move_cmd
+
+  " Visual mode
+  let is_v = a:op =~# "^[vV\<C-v>]"
+  if is_v
+      norm! gv
+      call feedkeys(abs(lnum-orig_lnum) . move_cmd, 'n')
+      return ''
+  endif
+
+  call feedkeys(a:op. abs(lnum-orig_lnum) . move_cmd, 'n')
 endfunction
 
 function! s:island(lnum, vcol) abort

@@ -12,8 +12,13 @@ if exists('g:loaded_edgemotion')
 endif
 let g:loaded_edgemotion = 1
 
-noremap <silent><expr> <Plug>(edgemotion-j) edgemotion#move(1)
-noremap <silent><expr> <Plug>(edgemotion-k) edgemotion#move(0)
+" Cancel the pending cmd and call Edgemotion with the old canceled cmd as an argument
+nnoremap <silent><Plug>(edgemotion-j) <Esc>:<C-U>:call edgemotion#move('', 1)<CR>
+nnoremap <silent><Plug>(edgemotion-k) <Esc>:<C-U>:call edgemotion#move('', 0)<CR>
+xnoremap <silent><Plug>(edgemotion-j) <Esc>:<C-U>:call edgemotion#move(visualmode(), 1)<CR>
+xnoremap <silent><Plug>(edgemotion-k) <Esc>:<C-U>:call edgemotion#move(visualmode(), 0)<CR>
+onoremap <silent><Plug>(edgemotion-j) <Esc>:<C-U>:call edgemotion#move(v:operator, 1)<CR>
+onoremap <silent><Plug>(edgemotion-k) <Esc>:<C-U>:call edgemotion#move(v:operator, 0)<CR>
 
 " __END__
 " vim: expandtab softtabstop=2 shiftwidth=2 foldmethod=marker
