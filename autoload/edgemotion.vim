@@ -69,11 +69,11 @@ function! edgemotion#move(op, dir) abort
   let is_v = a:op =~# "^[vV\<C-v>]"
   if is_v
       norm! gv
-      call feedkeys(abs(lnum-orig_lnum) . move_cmd, 'n')
+      call feedkeys(abs(lnum-orig_lnum) . move_cmd, 'nt')
       return ''
   endif
 
-  call feedkeys(a:op. abs(lnum-orig_lnum) . move_cmd, 'n')
+  call feedkeys(a:op. abs(lnum-orig_lnum) . move_cmd, 'nt')
 endfunction
 
 function! s:island(lnum, vcol) abort
