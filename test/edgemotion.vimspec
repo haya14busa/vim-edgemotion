@@ -80,10 +80,12 @@ Describe edgemotion
       Assert Equals(getline('.'), 'function! s:f() abort')
       normal jk
       call edgemotion#move('', s:DIRECTION.FORWARD)
+      normal jk
       Assert Equals(CursorChar(), 'u')
       Assert Equals(getline('.'), 'endfunction')
       normal jk
       call edgemotion#move('', s:DIRECTION.BACKWARD)
+      normal jk
       Assert Equals(CursorChar(), 't')
       Assert Equals(getline('.'), 'function! s:f() abort')
     End

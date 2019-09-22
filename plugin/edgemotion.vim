@@ -20,5 +20,17 @@ xnoremap <silent><Plug>(edgemotion-k) <Esc>:<C-U>:call edgemotion#move(visualmod
 onoremap <silent><Plug>(edgemotion-j) <Esc>:<C-U>:call edgemotion#move(v:operator, 1)<CR>
 onoremap <silent><Plug>(edgemotion-k) <Esc>:<C-U>:call edgemotion#move(v:operator, 0)<CR>
 
+
+" Global options definition.
+let g:edgemotion#line_numbers_overwrite  = get(g:, 'edgemotion#line_numbers_overwrite',
+      \ get(g:, 'edgemotion#line_numbers_overwrite', 0))
+if g:edgemotion#line_numbers_overwrite
+  if exists('*nvim_create_buf')
+    autocmd! CursorHold * call edgemotion#cursor_move()
+    autocmd! CursorMoved * call edgemotion#cursor_clean()
+    autocmd! InsertLeave * call edgemotion#cursor_move()
+  endif
+endif
+
 " __END__
 " vim: expandtab softtabstop=2 shiftwidth=2 foldmethod=marker

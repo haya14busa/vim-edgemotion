@@ -1,6 +1,5 @@
 ## EdgeMotion
 
-[![Build Status](https://travis-ci.org/haya14busa/vim-edgemotion.svg?branch=master)](https://travis-ci.org/haya14busa/vim-edgemotion)
 [![](http://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![](http://img.shields.io/badge/doc-%3Ah%20edgemotion.txt-red.svg)](doc/edgemotion.txt)
 
@@ -19,8 +18,25 @@ map <C-j> <Plug>(edgemotion-j)
 map <C-k> <Plug>(edgemotion-k)
 ```
 
+The key mapping can be preceded by a number, if so, `edgemotion` will jump X
+time.
+
+### Option
+
+```vim
+let g:edgemotion#line_numbers_overwrite = 1
+```
+If the value of this variable is non-zero, `edgemotion` will overwrite the line
+numbers, to contain the edgemotion jump count number. (Neovim only)
+
 ## Author
-haya14busa (https://github.com/haya14busa)
+haya14busa (https://github.com/haya14busa) & Drakirus (https://github.com/Drakirus/)
+
 
 ## Document
 [:h edgemotion.txt](doc/edgemotion.txt)
+
+## Changelog
+ - Drakirus add line_numbers_overwrite
+ - Drakirus add support for count number
+ - haya14busa initial release

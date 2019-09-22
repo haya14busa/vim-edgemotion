@@ -32,6 +32,7 @@ CONTENTS				*edgemotion-contents*
 INTRODUCTION		|edgemotion-introduction|
 INTERFACE		|edgemotion-interface|
 	Key Mappings		|edgemotion-key-mappings|
+	Options 		|edgemotion-options|
 
 ==============================================================================
 INTRODUCTION				*edgemotion-introduction*
@@ -46,6 +47,12 @@ vmp: the most ambitious vim emulator[2]
 
 ==============================================================================
 INTERFACE				*edgemotion-interface*
+------------------------------------------------------------------------------
+OPTIONS 				*edgemotion-options*
+
+					 *'g:edgemotion#line_numbers_overwrite'*
+Use this option enable line numbers overwrite indicator: >
+  let g:edgemotion#line_numbers_overwrite = 1
 ------------------------------------------------------------------------------
 KEY MAPPINGS				*edgemotion-key-mappings*
 
