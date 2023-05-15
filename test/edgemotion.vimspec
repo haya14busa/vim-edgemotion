@@ -42,14 +42,14 @@ Describe edgemotion
       Assert Equals(getline('.'), 'function! s:f() abort')
       Assert Equals(CursorChar(), 'f')
       let move_cmds = edgemotion#move(s:DIRECTION.FORWARD)
-      Assert Equals(move_cmds, '7j')
+      Assert Equals(move_cmds, '10gg')
       execute 'normal!' move_cmds
       Assert Equals(getline('.'), 'endfunction')
       Assert Equals(CursorChar(), 'e')
 
       " endfunction to function
       let move_cmds = edgemotion#move(s:DIRECTION.BACKWARD)
-      Assert Equals(move_cmds, '7k')
+      Assert Equals(move_cmds, '3gg')
       execute 'normal!' move_cmds
       Assert Equals(getline('.'), 'function! s:f() abort')
       Assert Equals(CursorChar(), 'f')
