@@ -51,8 +51,7 @@ function! edgemotion#move(dir) abort
     return ''
   endif
 
-  let move_cmd = a:dir is# s:DIRECTION.FORWARD ? 'j' : 'k'
-  return abs(lnum-orig_lnum) . move_cmd
+  return lnum . 'gg'
 endfunction
 
 function! s:island(lnum, vcol) abort
